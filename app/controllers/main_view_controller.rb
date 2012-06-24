@@ -95,7 +95,6 @@ private
       @alert ||= Alert.new
       @alert.title = "LIFE by Thom Parkin"
       @alert.message = "You cannot alter the cells while they are Evolving.  Stop the Evolution first."
-      puts @alert.inspect
       @alert.show
     else
       update_world unless @first_touch
