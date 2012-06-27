@@ -14,9 +14,6 @@ class MainViewController < UIViewController
 
   INIT_CELL = [ "L", "I", "F", "E", " "]
 
-  LIVE_CELL = "0"
-  DEAD_CELL = ""
-
   EVOLVE_TIMER_INTERVAL = 1.0
 
   #The following lines allow us to modify the application simply by changing the CELL_X_SIZE and CELL_Y_SIZE
@@ -69,6 +66,11 @@ class MainViewController < UIViewController
     @iterations.setHidden true
     @iterations_label.setHidden true
     @evolution_iterations = 0
+
+    #image for 'living' cell
+    @livingImage = UIImage.imageNamed("living.png")
+    #image for 'empty' cell
+    @emptyImage = UIImage.imageNamed("empty.png")
   end
 
 private
@@ -108,7 +110,7 @@ private
     cell = @community[idx]
     cell.state = !cell.state
     @community[idx] = cell
-    (cell.button).setTitle(state_display(cell.state), forState:UIControlStateNormal)    
+    (cell.button).setImage(state_display(cell.state), forState:UIControlStateNormal)  
   end
 
   def start_evolution
@@ -165,8 +167,7 @@ private
         if (ypos) < (UIScreen.mainScreen.applicationFrame.size.height - CELL_Y_SIZE * 1.15) then #we wish to leave a little space for the buttons
           loc = UIButton.buttonWithType(UIButtonTypeCustom)
           loc.backgroundColor = UIColor.lightGrayColor
-          loc.setTitle(INIT_CELL.fetch(i) { |i| INIT_CELL[i % INIT_CELL.size] }, forState:UIControlStateNormal)
-          loc.setTitleColor(UIColor.greenColor, forState:UIControlStateHighlighted)
+          loc.setImage(@livingImage, forState: UIControlStateNormal)
           loc.layer.setBorderColor(UIColor.blackColor.CGColor)
           loc.frame = [[xpos, ypos], [CELL_X_SIZE, CELL_Y_SIZE] ]
           cell = Cell.new(loc.__id__, loc) #set the unique identifier and the object
@@ -191,7 +192,7 @@ private
     @community.each_index { |idx|
       cell = @community[idx]
       loc = cell.button
-      loc.setTitle(state_display(cell.state), forState:UIControlStateNormal)
+      loc.setImage(state_display(cell.state), forState:UIControlStateNormal)
     }
   end
 
@@ -230,8 +231,8 @@ private
 
   def state_display(_state)
     case                      #ruby syntax is so sweet
-    when _state then LIVE_CELL
-    when !_state then DEAD_CELL
+    when _state then @livingImage #LIVE_CELL
+    when !_state then @emptyImage #DEAD_CELL
     end
   end
 
