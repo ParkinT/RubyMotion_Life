@@ -134,6 +134,9 @@ private
     }
     @iterations.text = (@evolution_iterations += 1).to_s
     update_world
+    if check_for_statis  #are we 'stuck' in a non-changing state?
+      
+    end
  end
 
   def stop_evolution
@@ -167,7 +170,8 @@ private
         if (ypos) < (UIScreen.mainScreen.applicationFrame.size.height - CELL_Y_SIZE * 1.15) then #we wish to leave a little space for the buttons
           loc = UIButton.buttonWithType(UIButtonTypeCustom)
           loc.backgroundColor = UIColor.lightGrayColor
-          loc.setImage(@livingImage, forState: UIControlStateNormal)
+          loc.setTitle(INIT_CELL.fetch(i) { |i| INIT_CELL[i % INIT_CELL.size] }, forState:UIControlStateNormal)
+          loc.setTitleColor(UIColor.greenColor, forState:UIControlStateHighlighted)
           loc.layer.setBorderColor(UIColor.blackColor.CGColor)
           loc.frame = [[xpos, ypos], [CELL_X_SIZE, CELL_Y_SIZE] ]
           cell = Cell.new(loc.__id__, loc) #set the unique identifier and the object
@@ -193,6 +197,7 @@ private
       cell = @community[idx]
       loc = cell.button
       loc.setImage(state_display(cell.state), forState:UIControlStateNormal)
+      loc.setTitle("  ")  #remove opening text on the first touch  -  this is not as elegant as I would like
     }
   end
 

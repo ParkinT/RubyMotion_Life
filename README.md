@@ -27,7 +27,7 @@ TODO
 *  Add an "I"nformation button that opens a panel listing the 'rules' (above).
 *  Allow pre-loading of setups to begin.  This alleviates the painstaking task of touches to toggle each cell into the initial state you wish.
 *  In the simulator, if you close the application then reopen it, it should reset.  I don't know how to do that with iOS or RubyMotion.
-*  Rather than a simple text representation, there should be an image on each button.
+*  The images that represent the Cells _really_ needs to replaced with something better.  I am a **terrible** artist.
 *  As a cell dies (and is born) the image should 'animate'.
 *  There are many setups that eventually settle into a statis (the pattern of cells does not change or it toggles between two states).  It would be nice to capture when this occurs and notify the user.
 *  TESTS!!!  Of course, we should have tests.
