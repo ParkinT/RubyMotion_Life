@@ -68,7 +68,17 @@ class MainViewController < UIViewController
     @evolution_iterations = 0
 
     #image for 'living' cell
-    @livingImage = UIImage.imageNamed("living.png")
+    @livingImages = [
+      UIImage.imageNamed("living0.png"),
+      UIImage.imageNamed("living1.png"),
+      UIImage.imageNamed("living2.png"),
+      UIImage.imageNamed("living3.png"),
+      UIImage.imageNamed("living4.png"),
+      UIImage.imageNamed("living5.png"),
+      UIImage.imageNamed("living6.png"),
+      UIImage.imageNamed("living7.png")
+      ]
+
     #image for 'empty' cell
     @emptyImage = UIImage.imageNamed("empty.png")
   end
@@ -134,8 +144,12 @@ private
     }
     @iterations.text = (@evolution_iterations += 1).to_s
     update_world
-    if check_for_statis  #are we 'stuck' in a non-changing state?
-      
+    if check_for_stasis?  #are we 'stuck' in a non-changing state?
+      @alert ||= Alert.new
+      @alert.title = "LIFE by Thom Parkin"
+      @alert.message = "We have reached an equilibrium.  No change for generations."
+      @alert.show
+      stop_evolution
     end
  end
 
@@ -236,9 +250,13 @@ private
 
   def state_display(_state)
     case                      #ruby syntax is so sweet
-    when _state then @livingImage #LIVE_CELL
+    when _state then @livingImages.sample #LIVE_CELL
     when !_state then @emptyImage #DEAD_CELL
     end
+  end
+
+  def check_for_stasis?
+    return false #stub
   end
 
 end
