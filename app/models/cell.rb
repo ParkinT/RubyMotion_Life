@@ -2,12 +2,13 @@ class Cell
   attr_reader :current_state #what we show to the world as state
   attr_accessor :id
   attr_accessor :button #object
-  attr_reader :neighborhood
+  attr_reader :neighborhood, :state_changed
 
   def initialize(_id, _btn)
     @id = _id
     @button = _btn
     @neighbors = Array.new  #we need to initialize
+    @state_changed = true
   end
 
   def state=(s)
@@ -22,6 +23,10 @@ class Cell
     return @button
   end
 
+  def changed?
+    @state_changed
+  end
+
 =begin
           THE RULES
          For a space that is 'populated':
@@ -32,19 +37,32 @@ class Cell
         * Each cell with three neighbors becomes populated.
 =end
   def evolve(neighbors_count)
+    #default before evaluation
+    @state_changed = false
+
     #evaluate all neighbors
     case
     when @current_state === false #empty
       #if there are exactly 3 neighbors, it will live
-      state = (neighbors_count == 3)
+      if neighbors_count == 3 then state = true end
+      @state_changed = !state
 
     when @current_state === true #populated
       #Lonely? - one or none neighbors
-      if neighbors_count < 2 then state = false end
+      if neighbors_count < 2
+        state = false
+        @state_changed = true
+      end
       #Overpopulated? - four or more neighbors
-      if neighbors_count > 3 then state = false end
+      if neighbors_count > 3
+        state = false
+        @state_changed = true
+      end
       #Suvives? - two or three neighbors
-      if neighbors_count == 2 or neighbors_count == 3 then state = true end
+      if neighbors_count == 2 or neighbors_count == 3
+        state = true
+        @state_changed = false
+      end
     else
      #
     end

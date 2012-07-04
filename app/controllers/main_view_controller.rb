@@ -12,6 +12,9 @@ class MainViewController < UIViewController
   COLOR_RED = UIColor.colorWithRed(1.0, green: 0.0, blue: 0.0, alpha: 1.0)
   COLOR_GRN = UIColor.colorWithRed(0, green: 1.0, blue: 0.0, alpha: 0.8)
 
+  CONTROLS_COLOR_BACKGROUND = UIColor.whiteColor
+  CONTROLS_BUTTON_COLOR_BACKGROUND = UIColor.lightGrayColor
+
   INIT_CELL = [ "L", "I", "F", "E", " "]
 
   EVOLVE_TIMER_INTERVAL = 1.0
@@ -23,6 +26,28 @@ class MainViewController < UIViewController
 
   TOTAL_CELLS = COLS * ROWS
 
+  #referenced in construct_ui
+  ITERATIONS_TOTAL_HEIGHT = 60
+  STOP_START_BUTTON_WIDTH = (UIScreen.mainScreen.applicationFrame.size.width / 2) -10
+  STOP_START_BUTTON_HEIGHT = 30
+  STOP_START_BUTTON_TOP = UIScreen.mainScreen.applicationFrame.size.height - 30
+  STOP_START_BUTTON_LEFT = 10
+  #===============
+  EVOLVE_BUTTON_WIDTH = STOP_START_BUTTON_WIDTH
+  EVOLVE_BUTTON_HEIGHT = STOP_START_BUTTON_HEIGHT
+  EVOLVE_BUTTON_TOP = STOP_START_BUTTON_TOP
+  EVOLVE_BUTTON_LEFT = STOP_START_BUTTON_LEFT
+  #===============
+  EVOLVE_LABEL_WIDTH = 50
+  EVOLVE_LABEL_HEIGHT = ITERATIONS_TOTAL_HEIGHT * 0.45
+  EVOLVE_LABEL_TOP = EVOLVE_BUTTON_TOP
+  EVOLVE_LABEL_LEFT = UIScreen.mainScreen.applicationFrame.size.width - (EVOLVE_LABEL_WIDTH + 15)
+  #===============
+  ITERATIONS_WIDTH = EVOLVE_LABEL_WIDTH
+  ITERATIONS_HEIGHT = ITERATIONS_TOTAL_HEIGHT * 0.55
+  ITERATIONS_TOP = (UIScreen.mainScreen.applicationFrame.size.height) - ITERATIONS_TOTAL_HEIGHT
+  ITERATIONS_LEFT = EVOLVE_LABEL_LEFT
+
   #these are used in surrounding_ids for brevity in the code
   FIRST_COL = CELL_X_SIZE
   LAST_COL = (COLS * FIRST_COL) - CELL_X_SIZE
@@ -32,35 +57,7 @@ class MainViewController < UIViewController
   def viewDidLoad
     build_world
 
-    @evolve_btn = UIButton.buttonWithType(UIButtonTypeRoundedRect)
-    @evolve_btn.setTitle("Begin Evolution", forState:UIControlStateNormal)
-    @evolve_btn.setTitleColor COLOR_GRN, forState:UIControlStateNormal
-    @evolve_btn.frame = [[10, UIScreen.mainScreen.applicationFrame.size.height- 15], [(UIScreen.mainScreen.applicationFrame.size.width / 2) -10, 30]]
-    @evolve_btn.addTarget(self, action:'startTapped', forControlEvents:UIControlEventTouchUpInside)
-    self.view.addSubview(@evolve_btn)
-
-    @stop_btn = UIButton.buttonWithType(UIButtonTypeRoundedRect)
-    @stop_btn.setTitle("Stop Evolution", forState:UIControlStateNormal)
-    @stop_btn.setTitleColor COLOR_RED, forState:UIControlStateNormal
-    @stop_btn.frame = [[10, UIScreen.mainScreen.applicationFrame.size.height - 15], [(UIScreen.mainScreen.applicationFrame.size.width / 2) -10, 30]]
-    @stop_btn.addTarget(self, action:'stopTapped', forControlEvents:UIControlEventTouchUpInside)
-    @stop_btn.setHidden true
-    self.view.addSubview(@stop_btn)
-
-    frame = [[UIScreen.mainScreen.applicationFrame.size.width * 0.7, UIScreen.mainScreen.applicationFrame.size.height - 38], [50, 30]]
-    @iterations = UILabel.alloc.initWithFrame(frame)
-    @iterations.adjustsFontSizeToFitWidth = true
-    @iterations.textAlignment = UITextAlignmentCenter
-    @iterations.backgroundColor = UIColor.whiteColor
-    @iterations.text = ""
-    self.view.addSubview(@iterations)
-    frame = [[UIScreen.mainScreen.applicationFrame.size.width * 0.7, UIScreen.mainScreen.applicationFrame.size.height - 15], [50, 30]]
-    @iterations_label = UILabel.alloc.initWithFrame(frame)
-    @iterations_label.adjustsFontSizeToFitWidth = true
-    @iterations_label.textAlignment = UITextAlignmentCenter
-    @iterations_label.backgroundColor = UIColor.whiteColor
-    @iterations_label.text = "Evolutions"
-    self.view.addSubview(@iterations_label)
+    construct_ui
 
     #initialize
     @iterations.setHidden true
@@ -84,6 +81,38 @@ class MainViewController < UIViewController
   end
 
 private
+
+    def construct_ui
+      @evolve_btn = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+      @evolve_btn.setTitle("Begin Evolution", forState:UIControlStateNormal)
+      @evolve_btn.setTitleColor COLOR_GRN, forState:UIControlStateNormal
+      @evolve_btn.frame = [[EVOLVE_BUTTON_LEFT, EVOLVE_BUTTON_TOP], [EVOLVE_BUTTON_WIDTH, EVOLVE_BUTTON_HEIGHT]]
+      @evolve_btn.addTarget(self, action:'startTapped', forControlEvents:UIControlEventTouchUpInside)
+      self.view.addSubview(@evolve_btn)
+
+      @stop_btn = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+      @stop_btn.setTitle("Stop Evolution", forState:UIControlStateNormal)
+      @stop_btn.setTitleColor COLOR_RED, forState:UIControlStateNormal
+      @stop_btn.frame = [[STOP_START_BUTTON_LEFT, STOP_START_BUTTON_TOP], [STOP_START_BUTTON_WIDTH, STOP_START_BUTTON_HEIGHT]]
+      @stop_btn.addTarget(self, action:'stopTapped', forControlEvents:UIControlEventTouchUpInside)
+      @stop_btn.setHidden true
+      self.view.addSubview(@stop_btn)
+
+      frame = [[EVOLVE_LABEL_LEFT, EVOLVE_LABEL_TOP], [EVOLVE_LABEL_WIDTH, EVOLVE_LABEL_HEIGHT]]
+      @iterations_label = UILabel.alloc.initWithFrame(frame)
+      @iterations_label.adjustsFontSizeToFitWidth = true
+      @iterations_label.textAlignment = UITextAlignmentCenter
+      @iterations_label.backgroundColor = CONTROLS_COLOR_BACKGROUND
+      @iterations_label.text = "Evolutions"
+      self.view.addSubview(@iterations_label)
+      frame = [[ITERATIONS_LEFT, ITERATIONS_TOP], [ITERATIONS_WIDTH, ITERATIONS_HEIGHT]]
+      @iterations = UILabel.alloc.initWithFrame(frame)
+      @iterations.adjustsFontSizeToFitWidth = true
+      @iterations.textAlignment = UITextAlignmentCenter
+      @iterations.backgroundColor = CONTROLS_COLOR_BACKGROUND
+      @iterations.text = ""
+      self.view.addSubview(@iterations)
+    end
 
   def startTapped
     @evolving = true
@@ -120,7 +149,7 @@ private
     cell = @community[idx]
     cell.state = !cell.state
     @community[idx] = cell
-    (cell.button).setImage(state_display(cell.state), forState:UIControlStateNormal)  
+    (cell.button).setImage(state_display(cell.state), forState:UIControlStateNormal)
   end
 
   def start_evolution
@@ -183,7 +212,7 @@ private
         xpos = x * CELL_X_SIZE
         if (ypos) < (UIScreen.mainScreen.applicationFrame.size.height - CELL_Y_SIZE * 1.15) then #we wish to leave a little space for the buttons
           loc = UIButton.buttonWithType(UIButtonTypeCustom)
-          loc.backgroundColor = UIColor.lightGrayColor
+          loc.backgroundColor = CONTROLS_BUTTON_COLOR_BACKGROUND
           loc.setTitle(INIT_CELL.fetch(i) { |i| INIT_CELL[i % INIT_CELL.size] }, forState:UIControlStateNormal)
           loc.setTitleColor(UIColor.greenColor, forState:UIControlStateHighlighted)
           loc.layer.setBorderColor(UIColor.blackColor.CGColor)
