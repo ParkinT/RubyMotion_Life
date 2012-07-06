@@ -34,3 +34,6 @@ To do:
 *  Tests!  Of course, we should have tests.
 
 Please hack on this and, where you see an area for improvement, update it.  I would like to expand my expertise in Ruby Motion and appreciate your experience to guide me.  Don't hesitate to send a pull request.
+
+This application was fun to develop.  The very first thing I typed was `motion create life`.
+I felt like Doctor Frankenstein!! <g>
