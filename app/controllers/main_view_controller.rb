@@ -16,6 +16,13 @@ class MainViewController < UIViewController
   CONTROLS_BUTTON_COLOR_BACKGROUND = UIColor.lightGrayColor
 
   INIT_CELL = [ "L", "I", "F", "E", " "]
+  INIT_CELL_COLORS = [
+    UIColor.colorWithRed(0.0, green:0.0, blue:0.0, alpha:1.0),  #black
+    UIColor.colorWithRed(0.5, green:0.5, blue:0.0, alpha:1.0),  #yellow
+    UIColor.colorWithRed(0.0, green:1.0, blue:1.0, alpha:1.0),  #blue/green
+    UIColor.colorWithRed(1.0, green:0.0, blue:0.0, alpha:1.0),  #red
+    UIColor.colorWithRed(0.0, green:0.0, blue:0.0, alpha:1.0)  #black
+  ]
 
   EVOLVE_TIMER_INTERVAL = 1.0
 
@@ -31,7 +38,7 @@ class MainViewController < UIViewController
   STOP_START_BUTTON_WIDTH = (UIScreen.mainScreen.applicationFrame.size.width / 2) -10
   STOP_START_BUTTON_HEIGHT = 30
   STOP_START_BUTTON_TOP = UIScreen.mainScreen.applicationFrame.size.height - 30
-  STOP_START_BUTTON_LEFT = 10
+  STOP_START_BUTTON_LEFT = 20
   #===============
   EVOLVE_BUTTON_WIDTH = STOP_START_BUTTON_WIDTH
   EVOLVE_BUTTON_HEIGHT = STOP_START_BUTTON_HEIGHT
@@ -47,6 +54,16 @@ class MainViewController < UIViewController
   ITERATIONS_HEIGHT = ITERATIONS_TOTAL_HEIGHT * 0.55
   ITERATIONS_TOP = (UIScreen.mainScreen.applicationFrame.size.height) - ITERATIONS_TOTAL_HEIGHT
   ITERATIONS_LEFT = EVOLVE_LABEL_LEFT
+  #===============
+  CONFIG_WIDTH = 32
+  CONFIG_HEIGHT = 32
+  CONFIG_TOP = UIScreen.mainScreen.applicationFrame.size.height - CONFIG_HEIGHT
+  CONFIG_LEFT = EVOLVE_LABEL_LEFT - CONFIG_WIDTH
+  #===============
+  INFO_WIDTH = 32
+  INFO_HEIGHT = 32
+  INFO_TOP = CONFIG_TOP
+  INFO_LEFT = 0
 
   #these are used in surrounding_ids for brevity in the code
   FIRST_COL = CELL_X_SIZE
@@ -56,7 +73,6 @@ class MainViewController < UIViewController
 
   def viewDidLoad
     build_world
-
     construct_ui
 
     #initialize
@@ -78,6 +94,9 @@ class MainViewController < UIViewController
 
     #image for 'empty' cell
     @emptyImage = UIImage.imageNamed("empty.png")
+
+    #image for configuration action
+    @configImage = UIImage.imageNamed("gear.png")
   end
 
 private
@@ -112,6 +131,24 @@ private
       @iterations.backgroundColor = CONTROLS_COLOR_BACKGROUND
       @iterations.text = ""
       self.view.addSubview(@iterations)
+      #================================
+
+      # Information button
+      @info_btn = UIButton.buttonWithType(UIButtonTypeInfoDark)
+      @info_btn.backgroundColor = CONTROLS_BUTTON_COLOR_BACKGROUND
+      @info_btn.frame = [[INFO_LEFT, INFO_TOP], [INFO_WIDTH, INFO_HEIGHT]]
+      @info_btn.addTarget(self, action:'infoTapped', forControlEvents:UIControlEventTouchUpInside)
+      self.view.addSubview(@info_btn)
+
+      # Configuration Screen
+      @config_btn = UIButton.buttonWithType(UIButtonTypeCustom)
+      @config_btn.setImage(@configImage, forState:UIControlStateNormal)
+      @config_btn.backgroundColor = CONTROLS_BUTTON_COLOR_BACKGROUND
+      @config_btn.frame = [[CONFIG_LEFT, CONFIG_TOP], [CONFIG_WIDTH, CONFIG_HEIGHT]]
+      @config_btn.addTarget(self, action:'configTapped', forControlEvents:UIControlEventTouchUpInside)
+      self.view.addSubview(@config_btn)
+
+      self.view.setNeedsDisplay
     end
 
   def startTapped
@@ -143,6 +180,21 @@ private
       toggle_state(caller.__id__)
     end
   end 
+
+  def configTapped(*caller)
+    @config_btn.setImage(@configImage, forState:UIControlStateNormal)
+  end
+
+  def infoTapped(*caller)
+    @infoView ||= InfoView.alloc.initWithFrame([[10, 10], [UIScreen.mainScreen.applicationFrame.size.width - 40, 220]])
+    self.view.insertSubview(@infoView, aboveSubview:self)
+    @infoView.showAnimated
+    @infoView.info_close.addTarget(self, action:'infoClose', forControlEvents:UIControlEventTouchUpInside)
+  end
+
+  def infoClose(*caller)
+    @infoView.hideAnimated
+  end
 
   def toggle_state(cell_id)
     idx = find_cell_index cell_id
@@ -188,6 +240,7 @@ private
     @stop_btn.setHidden true
     if @timer.userInfo == 1
       @timer.invalidate
+      @timer = nil  #is this clean-up step necessary???
     end
   end
 
@@ -214,6 +267,7 @@ private
           loc = UIButton.buttonWithType(UIButtonTypeCustom)
           loc.backgroundColor = CONTROLS_BUTTON_COLOR_BACKGROUND
           loc.setTitle(INIT_CELL.fetch(i) { |i| INIT_CELL[i % INIT_CELL.size] }, forState:UIControlStateNormal)
+          loc.setTitleColor(INIT_CELL_COLORS.fetch(i) { |i| INIT_CELL_COLORS[i % INIT_CELL_COLORS.size] }, forState:UIControlStateNormal)
           loc.setTitleColor(UIColor.greenColor, forState:UIControlStateHighlighted)
           loc.layer.setBorderColor(UIColor.blackColor.CGColor)
           loc.frame = [[xpos, ypos], [CELL_X_SIZE, CELL_Y_SIZE] ]

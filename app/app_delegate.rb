@@ -1,8 +1,9 @@
 class AppDelegate
+
   def application(application, didFinishLaunchingWithOptions:launch_options)
     @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
 
-    @window.backgroundColor = UIColor.grayColor
+    @window.backgroundColor = UIColor.lightGrayColor
     @window.rootViewController = MainViewController.alloc.init
 
     # take up the whole screen
@@ -11,10 +12,14 @@ class AppDelegate
     # show the window
     @window.makeKeyAndVisible
 
-    # dim the status bar
-    application.setStatusBarStyle(UIStatusBarStyleBlackTranslucent)
+    application.setStatusBarHidden(true, withAnimation:UIStatusBarAnimationSlide)
 
     # return true to indicate this AppDelegate responded to this method
     true
   end
+
+  def info_controller
+    @info_controller ||= InfoController.alloc.init
+  end
+
 end
