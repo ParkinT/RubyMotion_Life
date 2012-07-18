@@ -19,16 +19,35 @@ class UILabel_Adjustable
 
 	MIN_FONT_SIZE = 8.0  #change this as desired for your purposes
 
+    PROPERTIES=[
+	    :msg,  # the text to display in the UILabel
+			:fontName, #define the font you want (using iOS font name)
+			:fontSize, #define the largest font size you want
+			:labelHeight #this must be set - the height of your UILabel
+    ]
+    PROPERTIES.each{|prop|
+      attr_accessor prop 
+    }
+
+=begin
 	attr_accessor :msg  # the text to display in the UILabel
 	attr_accessor :fontName #define the font you want (using iOS font name)
 	attr_accessor :fontSize #define the largest font size you want
 	attr_accessor :labelHeight #this must be set - the height of your UILabel
+=end
 
 	def initialize(params = {})
+=begin
 		@labelHeight = params[:labelHeight] if params[:labelHeight]
 		@fontName = params[:fontName] if params[:fontName]
 		@fontSize = params[:fontSize] if params[:fontSize]
 		@msg = params[:msg] if params[:msg]
+=end
+		params.each{ |key,value|
+        if self.class.const_get(:PROPERTIES).member?key.to_sym
+          self.send((key.to_s+"=:").to_sym,value)
+        end
+    }
 	end
 
 	def bestFit

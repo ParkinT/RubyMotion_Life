@@ -1,14 +1,18 @@
 class Cell
-  attr_reader :current_state #what we show to the world as state
+
   attr_accessor :id
   attr_accessor :button #object
-  attr_reader :neighborhood, :state_changed
+  attr_reader :current_state, #what we show to the world as state
+              :age,
+              :neighborhood,
+              :state_changed
 
   def initialize(_id, _btn)
     @id = _id
     @button = _btn
     @neighbors = Array.new  #we need to initialize
     @state_changed = true
+    @lifespan = 0
   end
 
   def state=(s)
@@ -25,6 +29,10 @@ class Cell
 
   def changed?
     @state_changed
+  end
+
+  def age
+    @lifespan.to_i
   end
 
 =begin
@@ -67,6 +75,12 @@ class Cell
      #
     end
     @current_state = (state == true)
+    #return age
+    if @state_changed
+      @lifespan = 0
+    else
+      @lifespan += 1
+    end
   end
 
   def add_neighbors(ids)

@@ -5,9 +5,9 @@ class Alert
 
   def initialize(params = {})
   	@alert_acknowledge = "OK"  #default
-	@alert_message = params[:message] if params[:message]
-	@alert_title = params[:title] if params[:title]
-	@alert_acknowledge =  params[:ok_text] if params[:ok_text]
+  	@alert_message = params[:message] if params[:message]
+  	@alert_title = params[:title] if params[:title]
+  	@alert_acknowledge =  params[:ok_text] if params[:ok_text]
   end
 
   def show

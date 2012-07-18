@@ -6,6 +6,7 @@ class MainViewController < UIViewController
   attr_reader :evolution_iterations, :iterations
   attr_reader :alert
 
+  CELLS_DIR = "cells/"
   CELL_X_SIZE = 35
   CELL_Y_SIZE = 35 #these should be configurable and NOT constants
 
@@ -82,14 +83,16 @@ class MainViewController < UIViewController
 
     #image for 'living' cell
     @livingImages = [
-      UIImage.imageNamed("living0.png"),
-      UIImage.imageNamed("living1.png"),
-      UIImage.imageNamed("living2.png"),
-      UIImage.imageNamed("living3.png"),
-      UIImage.imageNamed("living4.png"),
-      UIImage.imageNamed("living5.png"),
-      UIImage.imageNamed("living6.png"),
-      UIImage.imageNamed("living7.png")
+      UIImage.imageNamed(CELLS_DIR + "cell_01.png"),
+      UIImage.imageNamed(CELLS_DIR + "cell_02.png"),
+      UIImage.imageNamed(CELLS_DIR + "cell_03.png"),
+      UIImage.imageNamed(CELLS_DIR + "cell_04.png"),
+      UIImage.imageNamed(CELLS_DIR + "cell_05.png"),
+      UIImage.imageNamed(CELLS_DIR + "cell_06.png"),
+      UIImage.imageNamed(CELLS_DIR + "cell_07.png"),
+      UIImage.imageNamed(CELLS_DIR + "cell_08.png"),
+      UIImage.imageNamed(CELLS_DIR + "cell_09.png"),
+      UIImage.imageNamed(CELLS_DIR + "cell_10.png")
       ]
 
     #image for 'empty' cell
@@ -205,12 +208,12 @@ private
   end
 
   def start_evolution
+    save_setup       # take a snapshot of the arrangement of cells so the user can 'save' this one if he likes
     evolve_one_step  #first evolution must be immediate - before the time event fires
 
     @iterations.setHidden false
     @iterations_label.setHidden false
 
-    # I have frustrated myself with this block of code.  There must be a more elgant (more Ruby-esque) way to do this!!!
     @timer = NSTimer.scheduledTimerWithTimeInterval EVOLVE_TIMER_INTERVAL,
     target: proc { evolve_one_step },
     selector: :call,
@@ -220,8 +223,8 @@ private
 
   def evolve_one_step
      @community.each { |cell| 
-      survived = living_neighbors(cell)
-      cell.evolve(survived)
+      adjacent = living_neighbors(cell)
+      cell.evolve(adjacent)
     }
     @iterations.text = (@evolution_iterations += 1).to_s
     update_world
@@ -294,7 +297,7 @@ private
       cell = @community[idx]
       loc = cell.button
       loc.setImage(state_display(cell.state), forState:UIControlStateNormal)
-      loc.setTitle("  ")  #remove opening text on the first touch  -  this is not as elegant as I would like
+      loc.setTitle(" ") #remove opening text on the first touch  -  this is not as elegant as I would like
     }
   end
 
@@ -340,6 +343,10 @@ private
 
   def check_for_stasis?
     return false #stub
+  end
+
+  def save_setup
+    
   end
 
 end
