@@ -2,9 +2,12 @@ class MainViewController < UIViewController
 
   attr_reader :community
   attr_reader :evolving  #do not respond to user touches
-  attr_reader :timer, :first_touch     #internal use
+  attr_reader :timer, :first_touch  #internal use
   attr_reader :evolution_iterations, :iterations
   attr_reader :alert
+
+  @@last_snapshot = Array.new()
+  @@last_cells_count = 0
 
   CELLS_DIR = "cells/"
   CELL_X_SIZE = 35
@@ -125,7 +128,7 @@ private
       @iterations_label.adjustsFontSizeToFitWidth = true
       @iterations_label.textAlignment = UITextAlignmentCenter
       @iterations_label.backgroundColor = CONTROLS_COLOR_BACKGROUND
-      @iterations_label.text = "Evolutions"
+      @iterations_label.text = "Generations"
       self.view.addSubview(@iterations_label)
       frame = [[ITERATIONS_LEFT, ITERATIONS_TOP], [ITERATIONS_WIDTH, ITERATIONS_HEIGHT]]
       @iterations = UILabel.alloc.initWithFrame(frame)
@@ -208,13 +211,12 @@ private
   end
 
   def start_evolution
-    save_setup       # take a snapshot of the arrangement of cells so the user can 'save' this one if he likes
     evolve_one_step  #first evolution must be immediate - before the time event fires
 
     @iterations.setHidden false
     @iterations_label.setHidden false
 
-    @timer = NSTimer.scheduledTimerWithTimeInterval EVOLVE_TIMER_INTERVAL,
+    @timer ||= NSTimer.scheduledTimerWithTimeInterval EVOLVE_TIMER_INTERVAL,
     target: proc { evolve_one_step },
     selector: :call,
     userInfo: 1, #1 = active, 0 = inactive
@@ -222,18 +224,22 @@ private
   end
 
   def evolve_one_step
-     @community.each { |cell| 
+    @@living_cells_count = 0
+    @community.each { |cell| 
       adjacent = living_neighbors(cell)
-      cell.evolve(adjacent)
+      if cell.evolve(adjacent) > 0
+        @@living_cells_count += 1
+      end
     }
+
     @iterations.text = (@evolution_iterations += 1).to_s
     update_world
     if check_for_stasis?  #are we 'stuck' in a non-changing state?
       @alert ||= Alert.new
       @alert.title = "LIFE by Thom Parkin"
-      @alert.message = "We have reached an equilibrium.  No change for generations."
+      @alert.message = "We have reached an equilibrium.  No change for future generations."
       @alert.show
-      stop_evolution
+      stopTapped
     end
  end
 
@@ -241,9 +247,10 @@ private
     @evolving = false
     @evolve_btn.setHidden false
     @stop_btn.setHidden true
+    return if @timer.nil?
     if @timer.userInfo == 1
       @timer.invalidate
-      @timer = nil  #is this clean-up step necessary???
+      @timer = nil
     end
   end
 
@@ -296,7 +303,8 @@ private
     @community.each_index { |idx|
       cell = @community[idx]
       loc = cell.button
-      loc.setImage(state_display(cell.state), forState:UIControlStateNormal)
+      loc.setImage(state_display(cell.state, cell.age), forState:UIControlStateNormal)
+
       loc.setTitle(" ") #remove opening text on the first touch  -  this is not as elegant as I would like
     }
   end
@@ -306,15 +314,14 @@ private
   end
 
   def find_cell_index_at(_x, _y)
-    ret = nil
     @community.each_index { |idx|
       cell = @community[idx]
       loc = cell.button
       x = loc.frame.origin.x
       y = loc.frame.origin.y
-      ret = idx if ((x == _x) && (y == _y))
+      return idx if ((x == _x) && (y == _y))
     }
-    ret
+    return nil
   end
 
   #using our current x and y, calcualte all ids that are adjacent
@@ -334,7 +341,7 @@ private
     adj
   end
 
-  def state_display(_state)
+  def state_display(_state, _age=-1)  #we can use the 'age' param to determine which image (or image set) is selected
     case                      #ruby syntax is so sweet
     when _state then @livingImages.sample #LIVE_CELL
     when !_state then @emptyImage #DEAD_CELL
@@ -342,7 +349,34 @@ private
   end
 
   def check_for_stasis?
-    return false #stub
+    if (@@living_cells_count != @@last_cells_count)  #comparison is expensive, so a simple count can help limit the number of times we need to evaluate the entire collection
+      @@last_cells_count = @@living_cells_count
+      return false
+    end
+    curr_snapshot = snapshot
+    return true if (curr_snapshot == @@last_snapshot)
+    #implied else
+    @@last_snapshot = curr_snapshot
+    return false    
+  end
+
+  # return a snapshot of all currently living cells
+  def snapshot
+    current_snapshot = []
+    @community.each_index { |idx|
+      cell = @community[idx]
+      current_snapshot << cell.id if cell.state
+    }
+    current_snapshot
+  end
+
+  # restore the state to match the passed in snapshot
+  def snapshot=(snap)
+    @community.each_index { |idx|
+      cell = @community[idx]
+      cell.state = snap.include? cell.id
+    }
+    update_world
   end
 
   def save_setup

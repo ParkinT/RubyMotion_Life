@@ -14,6 +14,7 @@ class AppDelegate
 
     application.setStatusBarHidden(true, withAnimation:UIStatusBarAnimationSlide)
 
+#    Tapstream.setAccountName:"websembly", developerSecret:"xYv9OHVETuKs5aJyADmtjg"
     # return true to indicate this AppDelegate responded to this method
     true
   end
