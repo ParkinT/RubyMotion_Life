@@ -107,9 +107,6 @@ class MainViewController < UIViewController
     #image for configuration action
     @configImage = UIImage.imageNamed("gear.png")
 
-    # respond to Shake
-    shake_responder = ShakeResponder.alloc.init
-
   end
 
 private
@@ -200,6 +197,7 @@ private
 
   def infoTapped(*caller)
     @infoView ||= InfoView.alloc.initWithFrame([[10, 10], [UIScreen.mainScreen.applicationFrame.size.width - 40, 220]])
+    @infoView.displayText('info')
     self.view.insertSubview(@infoView, aboveSubview:self)
     @infoView.showAnimated
     @infoView.info_close.addTarget(self, action:'infoClose', forControlEvents:UIControlEventTouchUpInside)

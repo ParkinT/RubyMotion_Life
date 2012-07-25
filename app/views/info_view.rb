@@ -1,6 +1,26 @@
 class InfoView < UIView
 
-  attr_reader :info_close
+  attr_reader :info_close, :info_title
+
+  def displayText(info)
+    text = case info
+    when 'info'
+      info_text
+    when 'instructions'
+      instructions_text
+    end
+    @info_title.setText(text)
+    @info_title.adjustsFontSizeToFitWidth = true   #this only works when the text is set to single-line
+    # so I have chosen to do it this way
+    adjustableLabel = UILabel_Adjustable.new({:fontName => "Verdana", :fontSize => 75, :labelHeight => frame[1][1], :msg => text})
+
+    @info_title.setFont(adjustableLabel.bestFit)
+    @info_title.numberOfLines = 0 #for word wrap
+    @info_title.lineBreakMode = UILineBreakModeWordWrap
+    @info_title.color = UIColor.whiteColor
+    @info_title.backgroundColor = UIColor.colorWithPatternImage(UIImage.imageNamed("infobg.png"))
+    self.addSubview(@info_title)
+  end
 
   def initWithFrame(frame)
     if super
@@ -8,24 +28,13 @@ class InfoView < UIView
       @info_close.backgroundColor = UIColor.colorWithPatternImage(UIImage.imageNamed("infobg.png"))
       @info_close.frame = [[frame[0][0], 0], [frame[1][0], 32]]
       @info_close.setTitle("  C L O S E", forState:UIControlStateNormal)
-      @info_close.setTitleColor(UIColor.blackColor, forState:UIControlStateNormal)
+      @info_close.setTitleColor(UIColor.whiteColor, forState:UIControlStateNormal)
       @info_close.setTitleColor(UIColor.yellowColor, forState:UIControlStateSelected)
       @info_close.alpha = 0
       self.addSubview(@info_close)
 
       frame[0][1] = 32
-      info_title = UILabel.alloc.initWithFrame(frame)
-      info_title.setText(info_text)
-      info_title.adjustsFontSizeToFitWidth = true   #this only works when the text is set to single-line
-      # so I have chosen to do it this way
-      adjustableLabel = UILabel_Adjustable.new({:fontName => "Verdana", :fontSize => 75, :labelHeight => frame[1][1], :msg => info_text})
-
-      info_title.setFont(adjustableLabel.bestFit)
-      info_title.numberOfLines = 0 #for word wrap
-      info_title.lineBreakMode = UILineBreakModeWordWrap
-      info_title.color = UIColor.whiteColor
-      info_title.backgroundColor = UIColor.colorWithPatternImage(UIImage.imageNamed("infobg.png"))
-      self.addSubview(info_title)
+      @info_title = UILabel.alloc.initWithFrame(frame)
 
       self.alpha = 0
     end
@@ -72,4 +81,14 @@ class InfoView < UIView
 EOS
   end
 
+  def instructions_text
+    <<EOS
+    Set up a field of cells
+    Then click `Begin Evolution`
+    Your WORLD will evolve (based on The Rules of Life)
+
+    Shaking the device will set up a random field of cells for you.
+    You can toggle the state of a cell by touchng it.
+EOS
+  end
 end
