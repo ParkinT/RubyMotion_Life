@@ -11,10 +11,7 @@ Motion::Project::App.setup do |app|
   app.icons = ["#{app.name}.png", "#{app.name}-72.png", "#{app.name}@2x.png"]
   app.device_family = [:iphone, :ipad]
   app.interface_orientations = [:portrait, :landscape_left, :landscape_right] #:portrait_upside_down
-=begin         EXPERIMENTAL
   app.vendor_project('vendor/Tapstream.framework', :static,
         :products => ['Tapstream'],
-        :headers_dir => 'Versions/A/Headers')
-  app.frameworks += ['Tapstream']
-=end
+        :headers_dir => 'Headers')
 end

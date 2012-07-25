@@ -2,12 +2,15 @@ class MainViewController < UIViewController
 
   attr_reader :community
   attr_reader :evolving  #do not respond to user touches
-  attr_reader :timer, :first_touch  #internal use
+  attr_reader :timer, :first_touch, :living_cells  #internal use
   attr_reader :evolution_iterations, :iterations
   attr_reader :alert
 
   @@last_snapshot = Array.new()
   @@last_cells_count = 0
+  @@user_defaults = NSUserDefaults.standardUserDefaults
+
+  RAND_SETUP_SEED = 11 #somewhere between 8 and 13 is perfect
 
   CELLS_DIR = "cells/"
   CELL_X_SIZE = 35
@@ -103,59 +106,63 @@ class MainViewController < UIViewController
 
     #image for configuration action
     @configImage = UIImage.imageNamed("gear.png")
+
+    # respond to Shake
+    shake_responder = ShakeResponder.alloc.init
+
   end
 
 private
 
-    def construct_ui
-      @evolve_btn = UIButton.buttonWithType(UIButtonTypeRoundedRect)
-      @evolve_btn.setTitle("Begin Evolution", forState:UIControlStateNormal)
-      @evolve_btn.setTitleColor COLOR_GRN, forState:UIControlStateNormal
-      @evolve_btn.frame = [[EVOLVE_BUTTON_LEFT, EVOLVE_BUTTON_TOP], [EVOLVE_BUTTON_WIDTH, EVOLVE_BUTTON_HEIGHT]]
-      @evolve_btn.addTarget(self, action:'startTapped', forControlEvents:UIControlEventTouchUpInside)
-      self.view.addSubview(@evolve_btn)
+  def construct_ui
+    @evolve_btn = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+    @evolve_btn.setTitle("Begin Evolution", forState:UIControlStateNormal)
+    @evolve_btn.setTitleColor COLOR_GRN, forState:UIControlStateNormal
+    @evolve_btn.frame = [[EVOLVE_BUTTON_LEFT, EVOLVE_BUTTON_TOP], [EVOLVE_BUTTON_WIDTH, EVOLVE_BUTTON_HEIGHT]]
+    @evolve_btn.addTarget(self, action:'startTapped', forControlEvents:UIControlEventTouchUpInside)
+    self.view.addSubview(@evolve_btn)
 
-      @stop_btn = UIButton.buttonWithType(UIButtonTypeRoundedRect)
-      @stop_btn.setTitle("Stop Evolution", forState:UIControlStateNormal)
-      @stop_btn.setTitleColor COLOR_RED, forState:UIControlStateNormal
-      @stop_btn.frame = [[STOP_START_BUTTON_LEFT, STOP_START_BUTTON_TOP], [STOP_START_BUTTON_WIDTH, STOP_START_BUTTON_HEIGHT]]
-      @stop_btn.addTarget(self, action:'stopTapped', forControlEvents:UIControlEventTouchUpInside)
-      @stop_btn.setHidden true
-      self.view.addSubview(@stop_btn)
+    @stop_btn = UIButton.buttonWithType(UIButtonTypeRoundedRect)
+    @stop_btn.setTitle("Stop Evolution", forState:UIControlStateNormal)
+    @stop_btn.setTitleColor COLOR_RED, forState:UIControlStateNormal
+    @stop_btn.frame = [[STOP_START_BUTTON_LEFT, STOP_START_BUTTON_TOP], [STOP_START_BUTTON_WIDTH, STOP_START_BUTTON_HEIGHT]]
+    @stop_btn.addTarget(self, action:'stopTapped', forControlEvents:UIControlEventTouchUpInside)
+    @stop_btn.setHidden true
+    self.view.addSubview(@stop_btn)
 
-      frame = [[EVOLVE_LABEL_LEFT, EVOLVE_LABEL_TOP], [EVOLVE_LABEL_WIDTH, EVOLVE_LABEL_HEIGHT]]
-      @iterations_label = UILabel.alloc.initWithFrame(frame)
-      @iterations_label.adjustsFontSizeToFitWidth = true
-      @iterations_label.textAlignment = UITextAlignmentCenter
-      @iterations_label.backgroundColor = CONTROLS_COLOR_BACKGROUND
-      @iterations_label.text = "Generations"
-      self.view.addSubview(@iterations_label)
-      frame = [[ITERATIONS_LEFT, ITERATIONS_TOP], [ITERATIONS_WIDTH, ITERATIONS_HEIGHT]]
-      @iterations = UILabel.alloc.initWithFrame(frame)
-      @iterations.adjustsFontSizeToFitWidth = true
-      @iterations.textAlignment = UITextAlignmentCenter
-      @iterations.backgroundColor = CONTROLS_COLOR_BACKGROUND
-      @iterations.text = ""
-      self.view.addSubview(@iterations)
-      #================================
+    frame = [[EVOLVE_LABEL_LEFT, EVOLVE_LABEL_TOP], [EVOLVE_LABEL_WIDTH, EVOLVE_LABEL_HEIGHT]]
+    @iterations_label = UILabel.alloc.initWithFrame(frame)
+    @iterations_label.adjustsFontSizeToFitWidth = true
+    @iterations_label.textAlignment = UITextAlignmentCenter
+    @iterations_label.backgroundColor = CONTROLS_COLOR_BACKGROUND
+    @iterations_label.text = "Generations"
+    self.view.addSubview(@iterations_label)
+    frame = [[ITERATIONS_LEFT, ITERATIONS_TOP], [ITERATIONS_WIDTH, ITERATIONS_HEIGHT]]
+    @iterations = UILabel.alloc.initWithFrame(frame)
+    @iterations.adjustsFontSizeToFitWidth = true
+    @iterations.textAlignment = UITextAlignmentCenter
+    @iterations.backgroundColor = CONTROLS_COLOR_BACKGROUND
+    @iterations.text = ""
+    self.view.addSubview(@iterations)
+    #================================
 
-      # Information button
-      @info_btn = UIButton.buttonWithType(UIButtonTypeInfoDark)
-      @info_btn.backgroundColor = CONTROLS_BUTTON_COLOR_BACKGROUND
-      @info_btn.frame = [[INFO_LEFT, INFO_TOP], [INFO_WIDTH, INFO_HEIGHT]]
-      @info_btn.addTarget(self, action:'infoTapped', forControlEvents:UIControlEventTouchUpInside)
-      self.view.addSubview(@info_btn)
+    # Information button
+    @info_btn = UIButton.buttonWithType(UIButtonTypeInfoDark)
+    @info_btn.backgroundColor = CONTROLS_BUTTON_COLOR_BACKGROUND
+    @info_btn.frame = [[INFO_LEFT, INFO_TOP], [INFO_WIDTH, INFO_HEIGHT]]
+    @info_btn.addTarget(self, action:'infoTapped', forControlEvents:UIControlEventTouchUpInside)
+    self.view.addSubview(@info_btn)
 
-      # Configuration Screen
-      @config_btn = UIButton.buttonWithType(UIButtonTypeCustom)
-      @config_btn.setImage(@configImage, forState:UIControlStateNormal)
-      @config_btn.backgroundColor = CONTROLS_BUTTON_COLOR_BACKGROUND
-      @config_btn.frame = [[CONFIG_LEFT, CONFIG_TOP], [CONFIG_WIDTH, CONFIG_HEIGHT]]
-      @config_btn.addTarget(self, action:'configTapped', forControlEvents:UIControlEventTouchUpInside)
-      self.view.addSubview(@config_btn)
+    # Configuration Screen
+    @config_btn = UIButton.buttonWithType(UIButtonTypeCustom)
+    @config_btn.setImage(@configImage, forState:UIControlStateNormal)
+    @config_btn.backgroundColor = CONTROLS_BUTTON_COLOR_BACKGROUND
+    @config_btn.frame = [[CONFIG_LEFT, CONFIG_TOP], [CONFIG_WIDTH, CONFIG_HEIGHT]]
+    @config_btn.addTarget(self, action:'configTapped', forControlEvents:UIControlEventTouchUpInside)
+    self.view.addSubview(@config_btn)
 
-      self.view.setNeedsDisplay
-    end
+    self.view.setNeedsDisplay
+  end
 
   def startTapped
     @evolving = true
@@ -211,6 +218,7 @@ private
   end
 
   def start_evolution
+    save_setup       #if the user likes this setup, he can recall it
     evolve_one_step  #first evolution must be immediate - before the time event fires
 
     @iterations.setHidden false
@@ -348,6 +356,37 @@ private
     end
   end
 
+
+ # For `shake` support
+  attr_accessor :shaking
+  def shaking?
+    @shaking
+  end
+
+  def viewWillAppear(animated)
+    super
+    becomeFirstResponder
+  end
+
+  def viewDidDisappear(animated)
+    super
+    resignFirstResponder
+  end
+
+  def canBecomeFirstResponder
+    true
+  end
+
+  def motionEnded(motion, withEvent:event)
+    @shaking = motion == UIEventSubtypeMotionShake
+    random_setup if !@evolving
+  end
+
+  def random_setup
+    @community.each { |cell| cell.state = rand(30) < RAND_SETUP_SEED } 
+    update_world
+  end
+
   def check_for_stasis?
     if (@@living_cells_count != @@last_cells_count)  #comparison is expensive, so a simple count can help limit the number of times we need to evaluate the entire collection
       @@last_cells_count = @@living_cells_count
@@ -380,7 +419,39 @@ private
   end
 
   def save_setup
-    
+    #grab a snapshot and parse it
+    curr = snapshot
+    @living_cells = []
+    curr.each { |cell_id| 
+      idx = find_cell_index cell_id
+      cell = @community[idx]
+      btn = cell.button
+      x_loc = btn.frame.origin.x
+      y_loc = btn.frame.origin.y
+      @living_cells.push "#{x_loc},#{y_loc}"
+    }
+    saved_state = NSKeyedArchiver.archivedDataWithRootObject(self)
+    @@user_defaults["initial_state"] = saved_state
+
+  end
+
+  def load_setup
+    saved_state = defaults["initial_state"]
+    @living_cells = NSKeyedUnarchiver.unarchiveObjectWithData(saved_state)
+  end
+
+  # called when saving an object to NSUserDefaults
+  def encodeWithCoder(encoder)
+    puts "user_defaults store: #{@living_cells.inspect}"
+    encoder.encodeObject(@living_cells, forKey: "state")
+  end
+
+  # called when an object is loaded from NSUserDefaults
+  # this is an initializer, so should return `self`
+  def initWithCoder(decoder)
+    @living_cells = decoder.decodeObjectForKey("state")
+    puts "user_defaults retrieve: #{@living_cells}"
+    self
   end
 
 end

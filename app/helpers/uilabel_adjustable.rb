@@ -17,6 +17,7 @@ class UILabel_Adjustable
   #   adjustableLabel.msg = text
   #   text_label.setFont(adjustableLabel.bestFit)
 
+  DEBUG_MODE = true
 	MIN_FONT_SIZE = 8.0  #change this as desired for your purposes
 
     PROPERTIES=[
@@ -63,11 +64,10 @@ class UILabel_Adjustable
 		for s in @fontSize.downto(MIN_FONT_SIZE) do
 			#set the font size
 			font = font.fontWithSize(s)
-			NSLog("Trying size: #{s}")
+			NSLog("Trying size: #{s}") if DEBUG_MODE
 	        #This step is important: We make a constraint box using only the fixed WIDTH of the UILabel.
 	        #The height will be checked later.
 
-#			constraintSize = CGSizeMake(260.0, Float::MAX)
 			#Next, check how tall the label would be with the desired font.
 			labelSize = @msg.sizeWithFont(font, constrainedToSize:[260.0, Float::MAX], lineBreakMode:UILineBreakModeWordWrap)
 			#Here is where you use the height requirement!
@@ -75,7 +75,7 @@ class UILabel_Adjustable
 	   		#If the label fits into your required height, it will break the loop and use that font size.
 			break if(labelSize.height <= 180.0)
 		end
-	 	NSLog("Best size is: #{s}")
+	 	NSLog("Best size is: #{s}") if DEBUG_MODE
 		#return the selected font
 		font
 	end

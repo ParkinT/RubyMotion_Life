@@ -96,3 +96,35 @@ class Cell
   end
 
 end
+
+=begin
+FOR NSDEFAULT STORAGE
+class Post
+  attr_accessor :message
+  attr_accessor :id
+
+  # called when an object is loaded from NSUserDefaults
+  # this is an initializer, so should return `self`
+  def initWithCoder(decoder)
+    self.init
+    self.message = decoder.decodeObjectForKey("message")
+    self.id = decoder.decodeObjectForKey("id")
+    self
+  end
+
+  # called when saving an object to NSUserDefaults
+  def encodeWithCoder(encoder)
+    encoder.encodeObject(self.message, forKey: "message")
+    encoder.encodeObject(self.id, forKey: "id")
+  end
+end
+
+post_as_data = NSKeyedArchiver.archivedDataWithRootObject(post)
+defaults["saved_post"] = post_as_data
+
+# later on, we want to load this post:
+
+post_as_data = defaults["saved_post"]
+post = NSKeyedUnarchiver.unarchiveObjectWithData(post_as_data)
+
+=end
