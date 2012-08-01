@@ -14,9 +14,6 @@ class AppDelegate
 
     application.setStatusBarHidden(true, withAnimation:UIStatusBarAnimationSlide)
 
-    Tapstream.shared.setAccountName:"websembly", developerSecret:"xYv9OHVETuKs5aJyADmtjg"
-    Tapstream.shared.fireEvent("life%20activation")
-    
     # return true to indicate this AppDelegate responded to this method
     true
   end

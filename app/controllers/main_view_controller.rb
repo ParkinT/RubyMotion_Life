@@ -89,23 +89,23 @@ class MainViewController < UIViewController
 
     #image for 'living' cell
     @livingImages = [
-      UIImage.imageNamed(CELLS_DIR + "cell_01.png"),
-      UIImage.imageNamed(CELLS_DIR + "cell_02.png"),
-      UIImage.imageNamed(CELLS_DIR + "cell_03.png"),
-      UIImage.imageNamed(CELLS_DIR + "cell_04.png"),
-      UIImage.imageNamed(CELLS_DIR + "cell_05.png"),
-      UIImage.imageNamed(CELLS_DIR + "cell_06.png"),
-      UIImage.imageNamed(CELLS_DIR + "cell_07.png"),
-      UIImage.imageNamed(CELLS_DIR + "cell_08.png"),
-      UIImage.imageNamed(CELLS_DIR + "cell_09.png"),
-      UIImage.imageNamed(CELLS_DIR + "cell_10.png")
+      UIImage.imageNamed(CELLS_DIR + "cell_01"),
+      UIImage.imageNamed(CELLS_DIR + "cell_02"),
+      UIImage.imageNamed(CELLS_DIR + "cell_03"),
+      UIImage.imageNamed(CELLS_DIR + "cell_04"),
+      UIImage.imageNamed(CELLS_DIR + "cell_05"),
+      UIImage.imageNamed(CELLS_DIR + "cell_06"),
+      UIImage.imageNamed(CELLS_DIR + "cell_07"),
+      UIImage.imageNamed(CELLS_DIR + "cell_08"),
+      UIImage.imageNamed(CELLS_DIR + "cell_09"),
+      UIImage.imageNamed(CELLS_DIR + "cell_10")
       ]
 
     #image for 'empty' cell
-    @emptyImage = UIImage.imageNamed("empty.png")
+    @emptyImage = UIImage.imageNamed("empty")
 
     #image for configuration action
-    @configImage = UIImage.imageNamed("gear.png")
+    @configImage = UIImage.imageNamed("gear")
 
   end
 
@@ -212,7 +212,7 @@ private
     cell = @community[idx]
     cell.state = !cell.state
     @community[idx] = cell
-    (cell.button).setImage(state_display(cell.state), forState:UIControlStateNormal)
+    (cell.button).setBackgroundImage(state_display(cell.state), forState:UIControlStateNormal)
   end
 
   def start_evolution
@@ -284,7 +284,7 @@ private
           loc.backgroundColor = CONTROLS_BUTTON_COLOR_BACKGROUND
           loc.setTitle(INIT_CELL.fetch(i) { |i| INIT_CELL[i % INIT_CELL.size] }, forState:UIControlStateNormal)
           loc.setTitleColor(INIT_CELL_COLORS.fetch(i) { |i| INIT_CELL_COLORS[i % INIT_CELL_COLORS.size] }, forState:UIControlStateNormal)
-          loc.setTitleColor(UIColor.greenColor, forState:UIControlStateHighlighted)
+          loc.setTitleColor(UIColor.redColor, forState:UIControlStateHighlighted)
           loc.layer.setBorderColor(UIColor.blackColor.CGColor)
           loc.frame = [[xpos, ypos], [CELL_X_SIZE, CELL_Y_SIZE] ]
           cell = Cell.new(loc.__id__, loc) #set the unique identifier and the object
@@ -310,8 +310,7 @@ private
       cell = @community[idx]
       loc = cell.button
       loc.setImage(state_display(cell.state, cell.age), forState:UIControlStateNormal)
-
-      loc.setTitle(" ") #remove opening text on the first touch  -  this is not as elegant as I would like
+      loc.setTitle("") #remove opening text on the first touch  -  this is not as elegant as I would like
     }
   end
 
