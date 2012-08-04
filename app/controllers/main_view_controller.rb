@@ -107,6 +107,10 @@ class MainViewController < UIViewController
     #image for configuration action
     @configImage = UIImage.imageNamed("gear")
 
+    @usage = FirstUse.new "LIFE"
+    if (@usage.first_run?)
+      noticeDisplay 'instructions'
+    end
   end
 
 private
@@ -196,15 +200,25 @@ private
   end
 
   def infoTapped(*caller)
-    @infoView ||= InfoView.alloc.initWithFrame([[10, 10], [UIScreen.mainScreen.applicationFrame.size.width - 40, 220]])
-    @infoView.displayText('info')
+    noticeDisplay 'info'
+  end
+
+  def noticeDisplay(type='info')
+    @infoView ||= InfoView.alloc.initWithFrame([[10, 10], [UIScreen.mainScreen.applicationFrame.size.width - 40, 260]])
+    @infoView.displayText(type)
     self.view.insertSubview(@infoView, aboveSubview:self)
     @infoView.showAnimated
     @infoView.info_close.addTarget(self, action:'infoClose', forControlEvents:UIControlEventTouchUpInside)
+    @infoView.instructions.addTarget(self, action:'instructions', forControlEvents:UIControlEventTouchUpInside)
   end
 
   def infoClose(*caller)
     @infoView.hideAnimated
+  end
+
+  def instructions(*caller)
+    noticeDisplay 'instructions'
+    @infoView.instructions.alpha = 0
   end
 
   def toggle_state(cell_id)
@@ -212,7 +226,7 @@ private
     cell = @community[idx]
     cell.state = !cell.state
     @community[idx] = cell
-    (cell.button).setBackgroundImage(state_display(cell.state), forState:UIControlStateNormal)
+    (cell.button).setImage(state_display(cell.state), forState:UIControlStateNormal)
   end
 
   def start_evolution
@@ -439,7 +453,7 @@ private
 
   # called when saving an object to NSUserDefaults
   def encodeWithCoder(encoder)
-    puts "user_defaults store: #{@living_cells.inspect}"
+#    puts "user_defaults store: #{@living_cells.inspect}"
     encoder.encodeObject(@living_cells, forKey: "state")
   end
 
@@ -447,7 +461,7 @@ private
   # this is an initializer, so should return `self`
   def initWithCoder(decoder)
     @living_cells = decoder.decodeObjectForKey("state")
-    puts "user_defaults retrieve: #{@living_cells}"
+#    puts "user_defaults retrieve: #{@living_cells}"
     self
   end
 

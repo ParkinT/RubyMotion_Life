@@ -9,7 +9,7 @@ class UILabel_Adjustable
 	#   text_label.numberOfLines = 0 # set 0 for word wrap
   #   text_label.lineBreakMode = UILineBreakModeWordWrap
   #   text_label.setText(text)
-	#   adjustableLabel = UILabel_Adjustable.new({:fontName => "Arial", :fontSize => 72, :msg => text, :labelHeight => 120})
+	#   adjustableLabel = UILabel_Adjustable.new({:fontName => "Arial", :fontSize => 72, :msg => text, :labelHeight => 120, :labelWidth => 360.0})
 	#    ==== or you can be more verbose ====
   #   adjustableLabel = UILabel_Adjustable.new()
   #   adjustableLabel.fontName = "Arial"
@@ -17,25 +17,19 @@ class UILabel_Adjustable
   #   adjustableLabel.msg = text
   #   text_label.setFont(adjustableLabel.bestFit)
 
-  DEBUG_MODE = true
+  DEBUG_MODE = false
 	MIN_FONT_SIZE = 8.0  #change this as desired for your purposes
 
     PROPERTIES=[
 	    :msg,  # the text to display in the UILabel
 			:fontName, #define the font you want (using iOS font name)
 			:fontSize, #define the largest font size you want
-			:labelHeight #this must be set - the height of your UILabel
+			:labelHeight, #this must be set - the height of your UILabel
+      :labelWidth   #this must be set - the height of your UILabel
     ]
     PROPERTIES.each{|prop|
       attr_accessor prop 
     }
-
-=begin
-	attr_accessor :msg  # the text to display in the UILabel
-	attr_accessor :fontName #define the font you want (using iOS font name)
-	attr_accessor :fontSize #define the largest font size you want
-	attr_accessor :labelHeight #this must be set - the height of your UILabel
-=end
 
 	def initialize(params = {})
 =begin
@@ -53,10 +47,11 @@ class UILabel_Adjustable
 
 	def bestFit
 		#some defaults
-		@labelHeight ||= 180 #if the @labelHeight has not been set, we will assume a default
 		@msg ||= "It's bad luck to be superstitious"
 		@fontName ||= "Marker Felt"
 		@fontSize ||= 28
+    @labelHeight ||= 180.0
+    @labelWidth ||= 360.0
 
 		font = UIFont.fontWithName(@fontName, size:@fontSize)
 		# the loop begins at the largets font size and counts down two point sizes until
@@ -69,11 +64,11 @@ class UILabel_Adjustable
 	        #The height will be checked later.
 
 			#Next, check how tall the label would be with the desired font.
-			labelSize = @msg.sizeWithFont(font, constrainedToSize:[260.0, Float::MAX], lineBreakMode:UILineBreakModeWordWrap)
+			labelSize = @msg.sizeWithFont(font, constrainedToSize:[@labelWidth, Float::MAX], lineBreakMode:UILineBreakModeWordWrap)
 			#Here is where you use the height requirement!
 	   		#Set the value in the if statement to the height of your UILabel
 	   		#If the label fits into your required height, it will break the loop and use that font size.
-			break if(labelSize.height <= 180.0)
+			break if(labelSize.height <= @labelHeight)
 		end
 	 	NSLog("Best size is: #{s}") if DEBUG_MODE
 		#return the selected font
