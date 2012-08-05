@@ -18,6 +18,7 @@ class MainViewController < UIViewController
 
   COLOR_RED = UIColor.colorWithRed(1.0, green: 0.0, blue: 0.0, alpha: 1.0)
   COLOR_GRN = UIColor.colorWithRed(0, green: 1.0, blue: 0.0, alpha: 0.8)
+  COLOR_WHITE = UIColor.colorWithRed(1.0, green: 1.0, blue: 1.0, alpha: 1.0)
 
   CONTROLS_COLOR_BACKGROUND = UIColor.whiteColor
   CONTROLS_BUTTON_COLOR_BACKGROUND = UIColor.lightGrayColor
@@ -196,7 +197,7 @@ private
   end 
 
   def configTapped(*caller)
-    @config_btn.setImage(@configImage, forState:UIControlStateNormal)
+    @config_btn.setBackgroundImage(@configImage, forState:UIControlStateNormal)
   end
 
   def infoTapped(*caller)
@@ -295,10 +296,11 @@ private
         xpos = x * CELL_X_SIZE
         if (ypos) < (UIScreen.mainScreen.applicationFrame.size.height - CELL_Y_SIZE * 1.15) then #we wish to leave a little space for the buttons
           loc = UIButton.buttonWithType(UIButtonTypeCustom)
-          loc.backgroundColor = CONTROLS_BUTTON_COLOR_BACKGROUND
+          loc.backgroundColor = CONTROLS_COLOR_BACKGROUND
           loc.setTitle(INIT_CELL.fetch(i) { |i| INIT_CELL[i % INIT_CELL.size] }, forState:UIControlStateNormal)
           loc.setTitleColor(INIT_CELL_COLORS.fetch(i) { |i| INIT_CELL_COLORS[i % INIT_CELL_COLORS.size] }, forState:UIControlStateNormal)
-          loc.setTitleColor(UIColor.redColor, forState:UIControlStateHighlighted)
+          loc.setTitleColor(COLOR_RED, forState:UIControlStateHighlighted)
+          loc.setBackgroundImage(@emptyImage, forState:UIControlStateNormal)
           loc.layer.setBorderColor(UIColor.blackColor.CGColor)
           loc.frame = [[xpos, ypos], [CELL_X_SIZE, CELL_Y_SIZE] ]
           cell = Cell.new(loc.__id__, loc) #set the unique identifier and the object
@@ -322,9 +324,8 @@ private
     # we need to [re]display the existing cells
     @community.each_index { |idx|
       cell = @community[idx]
-      loc = cell.button
-      loc.setImage(state_display(cell.state, cell.age), forState:UIControlStateNormal)
-      loc.setTitle("") #remove opening text on the first touch  -  this is not as elegant as I would like
+      (cell.button).setImage(state_display(cell.state, cell.age), forState:UIControlStateNormal)
+#      (cell.button).setTitle("0") #remove opening text on the first touch  -  this is not as elegant as I would like
     }
   end
 
