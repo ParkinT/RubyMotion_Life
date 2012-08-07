@@ -21,7 +21,7 @@ class InfoView < UIView
     @info_box.color = UIColor.whiteColor
     @info_box.backgroundColor = UIColor.colorWithPatternImage(UIImage.imageNamed("infobg.png"))
 #    CGContextSetPatternPhase(@info_box, CGSizeMake(-800, 200)) #shift the bgImage
-    @instructions.alpha = 85
+    @instructions.alpha = 0.85
     self.addSubview(@info_box)
     self.addSubview(@info_close)
     self.addSubview(@instructions)

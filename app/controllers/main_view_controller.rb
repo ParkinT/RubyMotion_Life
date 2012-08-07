@@ -114,6 +114,13 @@ class MainViewController < UIViewController
     end
   end
 
+  def save_world
+    save_setup
+  end
+  def load_world
+    load_setup
+  end
+
 private
 
   def construct_ui
@@ -448,7 +455,7 @@ private
   end
 
   def load_setup
-    saved_state = defaults["initial_state"]
+    saved_state = @@user_defaults["initial_state"]
     @living_cells = NSKeyedUnarchiver.unarchiveObjectWithData(saved_state)
   end
 
