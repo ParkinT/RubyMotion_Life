@@ -46,7 +46,7 @@ class MainViewController < UIViewController
   STOP_START_BUTTON_WIDTH = (UIScreen.mainScreen.applicationFrame.size.width / 2) -10
   STOP_START_BUTTON_HEIGHT = 30
   STOP_START_BUTTON_TOP = UIScreen.mainScreen.applicationFrame.size.height - 30
-  STOP_START_BUTTON_LEFT = 20
+  STOP_START_BUTTON_LEFT = 32
   #===============
   EVOLVE_BUTTON_WIDTH = STOP_START_BUTTON_WIDTH
   EVOLVE_BUTTON_HEIGHT = STOP_START_BUTTON_HEIGHT
