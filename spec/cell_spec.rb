@@ -5,12 +5,12 @@ describe "Application 'life'" do
   	btn = UIButton.buttonWithType(UIButtonTypeCustom)
   	btn.frame = [[10, 11], [35, 35] ]
 
-    @cell = Cell.new(0x6a3f620, btn)
+    @cell = Cell.new(0x6a3f621, btn)
   end
 
   it "maintains state" do
   	@cell.state= false
-  	@cell.state.should == false
+  	@cell.state.should be.false
   	@cell.state= true
   	@cell.state.should == true
   end
@@ -18,7 +18,7 @@ describe "Application 'life'" do
   it "tracks change in state" do
   	@cell.state= false
   	@cell.state= true
-	@cell.changed?.should == true  	
+	  @cell.changed?.should == true  	
   end
 
   it "holds button reference" do
@@ -34,23 +34,23 @@ describe "Application 'life'" do
 	end
 	it "lonely cell dies" do
 		@c.evolve(0)
-		@c.state.should == false
+		@c.state.should be.false
 		@c.evolve(1)
-		@c.state.should == false
+		@c.state.should be.false
 	end 
 	it "overpopulated cell dies" do
 		@c.evolve(4)
-		@c.state.should == false
+		@c.state.should be.false
 		@c.evolve(5)
-		@c.state.should == false
+		@c.state.should be.false
 		@c.evolve(6)
-		@c.state.should == false
+		@c.state.should be.false
 	end
 	it "right balance of neighbors cell survives" do
 		@c.evolve(2)
-		@c.state.should == TRUE
+		@c.state.should be.true
 		@c.evolve(3)
-		@c.state.should == TRUE
+		@c.state.should be.true
 	end
   end
 
@@ -61,7 +61,7 @@ describe "Application 'life'" do
 	end
 	it "grows with 3 neighbors" do
 		@c.evolve(3)
-		@c.state.should == TRUE
+		@c.state.should be.true
 	end
   end
 

@@ -17,4 +17,5 @@ describe "Application 'life'" do
 #    controller.community.size.should == TOTAL_CELLS
     controller.community.size.should > 0
   end
+
 end

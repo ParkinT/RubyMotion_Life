@@ -1,25 +1,5 @@
 class AppDelegate
 
-  def application(application, didFinishLaunchingWithOptions:launch_options)
-    @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
-
-    @window.backgroundColor = UIColor.lightGrayColor
-    @window.rootViewController = MainViewController.alloc.init
-
-    # take up the whole screen
-    @window.rootViewController.wantsFullScreenLayout = true
-
-    # show the window
-    @window.makeKeyAndVisible
-
-    application.setStatusBarHidden(true, withAnimation:UIStatusBarAnimationSlide)
-
-    # UIApplicationExitsOnSuspend specifies that the app should be terminated rather than moved to the background when it is quit.
-
-    # return true to indicate this AppDelegate responded to this method
-    true
-
-  end
 
   def info_controller
     @info_controller ||= InfoController.alloc.init
@@ -28,6 +8,38 @@ class AppDelegate
    #   Most state transitions are accompanied by a corresponding call to the methods of your app delegate object. These methods are your chance to respond to state changes in an appropriate way. These methods are listed below, along with a summary of how you might use them.
 
    #application:didFinishLaunchingWithOptions:—This is your app’s first chance to execute code at launch time.
+  def application(application, didFinishLaunchingWithOptions:launch_options)
+    @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
+
+    @window.backgroundColor = UIColor.lightGrayColor
+    @window.rootViewController = MainViewController.alloc.init
+
+    # take up the whole screen
+    @window.rootViewController.wantsFullScreenLayout = true
+    
+    application.setStatusBarHidden(true, withAnimation:UIStatusBarAnimationSlide)
+
+    #Splash Screen
+     image_view = UIImageView.alloc.initWithImage(UIImage.imageNamed("Default.png"))
+     @window.rootViewController.view.addSubview(image_view)
+     @window.rootViewController.view.bringSubviewToFront(image_view)
+
+    # show the window
+    @window.makeKeyAndVisible
+
+    # UIApplicationExitsOnSuspend specifies that the app should be terminated rather than moved to the background when it is quit.
+
+     # fade out splash image
+     fade_out_timer = 1.0
+     UIView.transitionWithView(@window, duration:fade_out_timer, options:UIViewAnimationOptionTransitionNone, animations: lambda {image_view.alpha = 0}, completion: lambda do |finished|
+       image_view.removeFromSuperview
+       image_view = nil
+       UIApplication.sharedApplication.setStatusBarHidden(false, animated:false)
+     end)
+    # return true to indicate this AppDelegate responded to this method
+    true
+
+  end
 
    #applicationDidBecomeActive:—This is your app’s chance to prepare to run as the foreground app.
   def applicationDidBecomeActive(application)

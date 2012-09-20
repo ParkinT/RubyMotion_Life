@@ -80,6 +80,7 @@ class MainViewController < UIViewController
   LAST_ROW = (ROWS * FIRST_ROW) - CELL_Y_SIZE
 
   def viewDidLoad
+    super # because Clay Allsop says "You absolutely, must, without question call super in viewDidLoad, or else bad things will happen."
     build_world
     construct_ui
 
@@ -90,7 +91,8 @@ class MainViewController < UIViewController
 
     #image for 'living' cell
     @livingImages = [
-      UIImage.imageNamed(CELLS_DIR + "cell_01"),
+      UIImage.imageNamed(CELLS_DIR + "cell_01")
+=begin  Markus will create more cell images
       UIImage.imageNamed(CELLS_DIR + "cell_02"),
       UIImage.imageNamed(CELLS_DIR + "cell_03"),
       UIImage.imageNamed(CELLS_DIR + "cell_04"),
@@ -100,6 +102,7 @@ class MainViewController < UIViewController
       UIImage.imageNamed(CELLS_DIR + "cell_08"),
       UIImage.imageNamed(CELLS_DIR + "cell_09"),
       UIImage.imageNamed(CELLS_DIR + "cell_10")
+=end
       ]
 
     #image for 'empty' cell
@@ -120,6 +123,7 @@ class MainViewController < UIViewController
   def load_world
     load_setup
   end
+
 
 private
 
@@ -197,8 +201,8 @@ private
       @alert.message = "You cannot alter the cells while they are Evolving.  Stop the Evolution first."
       @alert.show
     else
-      update_world unless @first_touch
-      @first_touch = true
+      update_world unless @@first_touch
+      @@first_touch = true
       toggle_state(caller.__id__)
     end
   end 
@@ -296,7 +300,7 @@ private
     @community ||= Array.new
 
     #define cells
-    i = 1
+#    i = 1
     for y in -1..ROWS
       ypos = y * CELL_Y_SIZE
       for x in -1..COLS
@@ -304,8 +308,8 @@ private
         if (ypos) < (UIScreen.mainScreen.applicationFrame.size.height - CELL_Y_SIZE * 1.15) then #we wish to leave a little space for the buttons
           loc = UIButton.buttonWithType(UIButtonTypeCustom)
           loc.backgroundColor = CONTROLS_COLOR_BACKGROUND
-          loc.setTitle(INIT_CELL.fetch(i) { |i| INIT_CELL[i % INIT_CELL.size] }, forState:UIControlStateNormal)
-          loc.setTitleColor(INIT_CELL_COLORS.fetch(i) { |i| INIT_CELL_COLORS[i % INIT_CELL_COLORS.size] }, forState:UIControlStateNormal)
+#          loc.setTitle(INIT_CELL.fetch(i) { |i| INIT_CELL[i % INIT_CELL.size] }, forState:UIControlStateNormal)
+#          loc.setTitleColor(INIT_CELL_COLORS.fetch(i) { |i| INIT_CELL_COLORS[i % INIT_CELL_COLORS.size] }, forState:UIControlStateNormal)
           loc.setTitleColor(COLOR_RED, forState:UIControlStateHighlighted)
           loc.setBackgroundImage(@emptyImage, forState:UIControlStateNormal)
           loc.layer.setBorderColor(UIColor.blackColor.CGColor)
@@ -314,7 +318,7 @@ private
           @community.push cell
           loc.addTarget(self, action:'cellTapped', forControlEvents:UIControlEventTouchUpInside)
           self.view.addSubview(loc)
-          i += 1
+#          i += 1
         end
       end
     end
@@ -323,8 +327,10 @@ private
       loc = cell.button
       ids = surrounding_ids loc.frame.origin.x, loc.frame.origin.y
       cell.add_neighbors( surrounding_ids(loc.frame.origin.x, loc.frame.origin.y) )
+      loc.setTitle(INIT_CELL.fetch(idx) { |idx| INIT_CELL[idx % INIT_CELL.size] }, forState:UIControlStateNormal)
+      loc.setTitleColor(INIT_CELL_COLORS.fetch(idx) { |idx| INIT_CELL_COLORS[idx % INIT_CELL_COLORS.size] }, forState:UIControlStateNormal)
     }
-    @first_touch = false
+    @@first_touch = false
   end
 
   def update_world
