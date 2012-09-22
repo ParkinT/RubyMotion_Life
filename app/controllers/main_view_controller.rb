@@ -19,6 +19,7 @@ class MainViewController < UIViewController
   COLOR_RED = UIColor.colorWithRed(1.0, green: 0.0, blue: 0.0, alpha: 1.0)
   COLOR_GRN = UIColor.colorWithRed(0, green: 1.0, blue: 0.0, alpha: 0.8)
   COLOR_WHITE = UIColor.colorWithRed(1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+  COLOR_BLUE = UIColor.colorWithRed(0.0, green: 0.0, blue: 1.0, alpha: 1.0)
 
   CONTROLS_COLOR_BACKGROUND = UIColor.whiteColor
   CONTROLS_BUTTON_COLOR_BACKGROUND = UIColor.lightGrayColor
@@ -72,6 +73,11 @@ class MainViewController < UIViewController
   INFO_HEIGHT = 32
   INFO_TOP = CONFIG_TOP
   INFO_LEFT = 0
+  #===============
+  CLEAR_WIDTH = 55
+  CLEAR_HEIGHT = 28
+  CLEAR_TOP = CONFIG_TOP + 4
+  CLEAR_LEFT = STOP_START_BUTTON_WIDTH + STOP_START_BUTTON_LEFT + 5
 
   #these are used in surrounding_ids for brevity in the code
   FIRST_COL = CELL_X_SIZE
@@ -81,6 +87,8 @@ class MainViewController < UIViewController
 
   def viewDidLoad
     super # because Clay Allsop says "You absolutely, must, without question call super in viewDidLoad, or else bad things will happen."
+
+    @@first_touch = false
     build_world
     construct_ui
 
@@ -115,6 +123,7 @@ class MainViewController < UIViewController
     if (@usage.first_run?)
       noticeDisplay 'instructions'
     end
+
   end
 
   def save_world
@@ -143,6 +152,19 @@ private
     @stop_btn.setHidden true
     self.view.addSubview(@stop_btn)
 
+    @clear_btn = UIButton.buttonWithType(UIButtonTypeCustom)
+    @clear_btn.titleLabel.font = UIFont.boldSystemFontOfSize(10.5)
+    @clear_btn.setTitle "CLEAR", forState:UIControlStateNormal
+    @clear_btn.backgroundColor = COLOR_BLUE
+    @clear_btn.layer.borderColor = COLOR_RED
+    @clear_btn.layer.cornerRadius = 10.0
+    @clear_btn.layer.masksToBounds = true
+    @clear_btn.setTitleColor UIColor.whiteColor, forState:UIControlStateNormal
+    @clear_btn.frame = [[CLEAR_LEFT, CLEAR_TOP], [CLEAR_WIDTH, CLEAR_HEIGHT]]
+    @clear_btn.setHidden true
+    @clear_btn.addTarget(self, action:'clearTapped', forControlEvents:UIControlEventTouchUpInside)
+    self.view.addSubview(@clear_btn)
+
     frame = [[EVOLVE_LABEL_LEFT, EVOLVE_LABEL_TOP], [EVOLVE_LABEL_WIDTH, EVOLVE_LABEL_HEIGHT]]
     @iterations_label = UILabel.alloc.initWithFrame(frame)
     @iterations_label.adjustsFontSizeToFitWidth = true
@@ -166,6 +188,7 @@ private
     @info_btn.addTarget(self, action:'infoTapped', forControlEvents:UIControlEventTouchUpInside)
     self.view.addSubview(@info_btn)
 
+=begin
     # Configuration Screen
     @config_btn = UIButton.buttonWithType(UIButtonTypeCustom)
     @config_btn.setImage(@configImage, forState:UIControlStateNormal)
@@ -173,7 +196,7 @@ private
     @config_btn.frame = [[CONFIG_LEFT, CONFIG_TOP], [CONFIG_WIDTH, CONFIG_HEIGHT]]
     @config_btn.addTarget(self, action:'configTapped', forControlEvents:UIControlEventTouchUpInside)
     self.view.addSubview(@config_btn)
-
+=end
     self.view.setNeedsDisplay
   end
 
@@ -182,6 +205,7 @@ private
     @evolve_btn.setHidden true
     @stop_btn.setHidden false
     @evolve_btn.setTitle("Continue Evolution", forState:UIControlStateNormal)
+    @clear_btn.setHidden true
      
     start_evolution
   end
@@ -190,6 +214,7 @@ private
     @evolving = false
     @evolve_btn.setHidden false
     @stop_btn.setHidden true
+    @clear_btn.setHidden false
 
     stop_evolution
   end
@@ -200,6 +225,7 @@ private
       @alert.title = "LIFE by Thom Parkin"
       @alert.message = "You cannot alter the cells while they are Evolving.  Stop the Evolution first."
       @alert.show
+#      @alert.release
     else
       update_world unless @@first_touch
       @@first_touch = true
@@ -213,6 +239,13 @@ private
 
   def infoTapped(*caller)
     noticeDisplay 'info'
+  end
+
+  def clearTapped(*caller)
+#    confirm = UIAlertView.alloc.initWithTitle("LIFE by Thom Parkin", message:"All cells will be extinguished and the field will be reset.",delegate:nil,cancelButtonTitle:nil,otherButtonTitles:"OK")
+#    confirm.show
+    @clear_btn.setHidden true
+    build_world
   end
 
   def noticeDisplay(type='info')
@@ -300,7 +333,6 @@ private
     @community ||= Array.new
 
     #define cells
-#    i = 1
     for y in -1..ROWS
       ypos = y * CELL_Y_SIZE
       for x in -1..COLS
@@ -308,8 +340,6 @@ private
         if (ypos) < (UIScreen.mainScreen.applicationFrame.size.height - CELL_Y_SIZE * 1.15) then #we wish to leave a little space for the buttons
           loc = UIButton.buttonWithType(UIButtonTypeCustom)
           loc.backgroundColor = CONTROLS_COLOR_BACKGROUND
-#          loc.setTitle(INIT_CELL.fetch(i) { |i| INIT_CELL[i % INIT_CELL.size] }, forState:UIControlStateNormal)
-#          loc.setTitleColor(INIT_CELL_COLORS.fetch(i) { |i| INIT_CELL_COLORS[i % INIT_CELL_COLORS.size] }, forState:UIControlStateNormal)
           loc.setTitleColor(COLOR_RED, forState:UIControlStateHighlighted)
           loc.setBackgroundImage(@emptyImage, forState:UIControlStateNormal)
           loc.layer.setBorderColor(UIColor.blackColor.CGColor)
@@ -318,7 +348,6 @@ private
           @community.push cell
           loc.addTarget(self, action:'cellTapped', forControlEvents:UIControlEventTouchUpInside)
           self.view.addSubview(loc)
-#          i += 1
         end
       end
     end
@@ -327,10 +356,13 @@ private
       loc = cell.button
       ids = surrounding_ids loc.frame.origin.x, loc.frame.origin.y
       cell.add_neighbors( surrounding_ids(loc.frame.origin.x, loc.frame.origin.y) )
-      loc.setTitle(INIT_CELL.fetch(idx) { |idx| INIT_CELL[idx % INIT_CELL.size] }, forState:UIControlStateNormal)
+      if @@first_touch
+        random_setup 0
+      else
+      loc.setTitle INIT_CELL.fetch(idx) { |idx| INIT_CELL[idx % INIT_CELL.size] }, forState:UIControlStateNormal
       loc.setTitleColor(INIT_CELL_COLORS.fetch(idx) { |idx| INIT_CELL_COLORS[idx % INIT_CELL_COLORS.size] }, forState:UIControlStateNormal)
+    end
     }
-    @@first_touch = false
   end
 
   def update_world
@@ -338,7 +370,6 @@ private
     @community.each_index { |idx|
       cell = @community[idx]
       (cell.button).setImage(state_display(cell.state, cell.age), forState:UIControlStateNormal)
-#      (cell.button).setTitle("0") #remove opening text on the first touch  -  this is not as elegant as I would like
     }
   end
 
@@ -407,8 +438,8 @@ private
     random_setup if !@evolving
   end
 
-  def random_setup
-    @community.each { |cell| cell.state = rand(30) < RAND_SETUP_SEED } 
+  def random_setup(seed=RAND_SETUP_SEED)
+    @community.each { |cell| cell.state = rand(30) < seed } 
     update_world
   end
 

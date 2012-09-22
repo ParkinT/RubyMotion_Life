@@ -8,11 +8,19 @@ class Alert
   	@alert_message = params[:message] if params[:message]
   	@alert_title = params[:title] if params[:title]
   	@alert_acknowledge =  params[:ok_text] if params[:ok_text]
+=begin
+    Alert Style                       Text Fields
+  UIAlertViewStyleDefault         No user-editable text fields.
+  UIAlertViewStyleSecureTextInput   A single text field at index 0.
+  UIAlertViewStylePlainTextInput    A single text field at index 0.
+  UIAlertViewStyleLoginAndPasswordInput  The login field is at index 0. The password field is at index 1.
+=end
   end
 
   def show
     @dialog ||= UIAlertView.alloc.initWithTitle(@alert_title, message:@alert_message,delegate:nil,cancelButtonTitle:nil,otherButtonTitles:@alert_acknowledge)
-	@dialog.show
+    @dialog.UIAlertViewStyle = UIAlertViewStyleDefault
+	  @dialog.show
   end
 
   def message=(msg)
