@@ -1,9 +1,21 @@
+__This is intended to be a COMMUNITY PROJECT__  You are highly encouraged to:
+* Fork
+* Hack
+* Pull Request
+* Repeat
+
+Consider this another __playground__ for you to exercise and improve your RubyMotion expertise.
+
+= = = = = = = = = = = = = = = 
+
+
+
 LIFE
 ====
 
 As an example and exercise for RubyMotion, this is - yet another - implementation of John Conway's LIFE.
 
-2012 Thom Parkin  http://github.com:ParkinT/RubyMotion_Life
+2012-2013 Thom Parkin  http://github.com:ParkinT/RubyMotion_Life
 
 The Rules
 ---------
