@@ -1,8 +1,5 @@
 __This is intended to be a COMMUNITY PROJECT__  You are highly encouraged to:
-* Fork
-* Hack
-* Pull Request
-* Repeat
+* Fork, Hack, Pull Request, Repeat
 
 Consider this another __playground__ for you to exercise and improve your RubyMotion expertise.
 
