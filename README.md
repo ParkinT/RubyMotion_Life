@@ -29,6 +29,8 @@ Initially, a field is displayed that represents a set of cells.  The initial sta
 Tapping a cell will toggle its state.
 Once you have set up the field as you wish, "Begin Evolution" will start the process of evolving based on the rules John Conway had set out in 1970.
 
+<a href="http://twitter.com/home/?status=Thanks @ParkinT for making RubyMotion_Life: https%3A%2F%2Fgithub.com%2FParkinT%2FRubyMotion_Life"><img src="https://s3.amazonaws.com/github-thank-you-button/thank-you-button.png" alt="Say Thanks" /></a>
+
 To do:
 ------
 *  Settings bundle (maybe utilize this gem: https://github.com/qrush/motion-settings-bundle)
