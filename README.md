@@ -41,7 +41,7 @@ To do:
 *  There are many setups that eventually settle into a statis (the pattern of cells does not change or it toggles between two states).  It would be nice to capture when this occurs and notify the user.
 *  Tests!  Of course, we should have tests.
 
-Please hack on this and, where you see an area for improvement, update it.  I would like to expand my expertise in Ruby Motion and appreciate your experience to guide me.  Don't hesitate to send a pull request.
+Please hack on this and, where you see an area for improvement, update it.  Don't hesitate to send a pull request.
 
 This application was fun to develop.  The very first thing I typed was `motion create life`.
 I felt like Doctor Frankenstein!! <g>
