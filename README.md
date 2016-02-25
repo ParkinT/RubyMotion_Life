@@ -10,6 +10,8 @@ Consider this another __playground__ for you to exercise and improve your RubyMo
 LIFE
 ====
 
+[![Join the chat at https://gitter.im/ParkinT/RubyMotion_Life](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ParkinT/RubyMotion_Life?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 As an example and exercise for RubyMotion, this is - yet another - implementation of John Conway's LIFE.
 
 2012-2013 Thom Parkin  http://github.com:ParkinT/RubyMotion_Life
